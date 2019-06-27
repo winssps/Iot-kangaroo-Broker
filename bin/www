@@ -1,0 +1,14 @@
+#!/usr/bin/env node
+var mongoose = require('mongoose');
+var app = require('../server/app');
+
+mongoose.connect('mongodb://localhost:27017/mqtt', { useNewUrlParser: true });
+
+
+
+app.listen(3000, () => {
+  console.log('listenning on 3000');
+});
+
+
+

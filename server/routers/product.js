@@ -3,15 +3,7 @@ const MogoModule = require('../models/mongodb');
 
 router.get('/', async (ctx, next) => {
   // 查询全部产品信息
-  let products = [];
-  await MogoModule.Product.find()
-    .then(res => {
-       console.log(res)
-      products = res;
-    })
-    .catch(err => {
-      console.log(err)
-    })
+  let products = await MogoModule.Product.find()
   ctx.body = products;
 })
 
@@ -20,39 +12,18 @@ router.get('/:key', async (ctx, next) => {
   console.log(ctx.params);
   let productkey = ctx.params.key;
   let products = {};
-  await MogoModule.Product.find({ productkey: productkey })
-    .then(async detail => {
-      console.log(detail)
-      products.detail = detail;
-      return await MogoModule.Topic.find({ productkey: productkey })
-    })
-    .then(async topics => {
-      console.log(topics)
-      products.topics = topics;
-      return await MogoModule.Functions.find({ productkey: productkey })
-    })
-    .then(functions => {
-      console.log(functions);
-      products.functions = functions;
-    })
-    .catch(err => {
-      console.log(err)
-    })
+  products.detail = await MogoModule.Product.find({ productkey: productkey })
+  products.topics = await MogoModule.Topic.find({ productkey: productkey })
+  products.functions = await MogoModule.Functions.find({ productkey: productkey })
   ctx.body = products;
 })
 
 router.post('/', async (ctx, next) => {
   let data = ctx.request.body;
   console.log(data)
-  var product = new MogoModule.Product(data);
-  product.save(function (err, fluffy) {
-    if (err) {
-      console.error(err);
-      return;
-    }
-  })
-
   const ProductKey = data.productkey;
+
+  let result = await MogoModule.Product.save(data)
 
   const topic_str_update = `/${ProductKey}/\$\{deviceName\}/user/update`;
   const topic_str_error = `/${ProductKey}/\$\{deviceName\}/user/update/error`;
@@ -86,27 +57,12 @@ router.post('/', async (ctx, next) => {
   console.log(topic_update, topic_error, topic_get);
 
   await topic_update.save()
-    .then(res => {
-      return topic_error.save();
-    })
-    .then(res => {
-      return topic_get.save();
-    })
-    .catch(err => {
-      console.error(err);
-    })
+  await topic_error.save();
+  await topic_get.save();
 
   // var topic = new MogoModule.Topic(topic_data);
   // 查询全部产品信息
-  let products = [];
-  await MogoModule.Product.find()
-    .then(res => {
-      // console.log(res)
-      products = res;
-    })
-    .catch(err => {
-      console.log(err)
-    })
+  let products = await MogoModule.Product.find()
   ctx.body = products;
 });
 
@@ -114,35 +70,13 @@ router.post('/', async (ctx, next) => {
 router.delete('/:key', async (ctx, next) => {
   let productkey = ctx.params.key;
   console.log(productkey);
-  await MogoModule.Product.deleteOne({productkey: productkey})
-  .then(async res => {
-    console.log(res);
-    await MogoModule.Topic.deleteMany({productkey: productkey})
-  })
-  .then(async res => {
-    console.log(res);
-    await MogoModule.Functions.deleteMany({productkey: productkey})
-  })
-  .then(async res => {
-    console.log(res);
-    return await MogoModule.Device.deleteMany({productkey: productkey})
-  })
-  .then(async res => {
-    console.log(res)
-    return await MogoModule.DeviceTopic.deleteMany({productkey: productkey})
-  })
-  .then( async res => {
-    console.log(res)
-    return await MogoModule.DeviceValue.deleteMany({productkey: productkey})
-  })
-  .then(res => {
-    console.log(res)
-  })
-  .catch(err => {
-    console.error(err);
-    ctx.body = {errmsg: err, errcode:0};
-  })
-  ctx.body = {errmsg:'ok',errcode:0};
+  await MogoModule.Product.deleteOne({ productkey: productkey })
+  await MogoModule.Topic.deleteMany({ productkey: productkey })
+  await MogoModule.Functions.deleteMany({ productkey: productkey })
+  await MogoModule.Device.deleteMany({ productkey: productkey })
+  await MogoModule.DeviceTopic.deleteMany({ productkey: productkey })
+  await MogoModule.DeviceValue.deleteMany({ productkey: productkey })
+  ctx.body = { errmsg: 'ok', errcode: 0 };
 })
 
 
@@ -151,30 +85,9 @@ router.post('/function', async (ctx, next) => {
   let data = ctx.request.body;
   console.log(data)
   let key = data.productkey;
-  var functions = new MogoModule.Functions(data);
-  let topic = [];
-
-  await functions.save(data)
-    .then(async res => {
-      console.log(res)
-    })
-    .catch(err => {
-      console.error(err);
-    })
-
-  let functions_data = [];
-  await MogoModule.Functions.find({ productkey: key }, { _id: 0, __v: 0 })
-    .then(res => {
-      console.log(res)
-      functions_data = res;
-    })
-    .catch(err => {
-      console.log(err)
-    })
-
+  await MogoModule.Functions.save(data)
+  let functions_data = await MogoModule.Functions.find({ productkey: key }, { _id: 0, __v: 0 })
   ctx.body = functions_data;
 });
-
-
 
 module.exports = router;

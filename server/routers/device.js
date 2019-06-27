@@ -27,8 +27,8 @@ router.post('/', async (ctx, next) => {
     devicename: deviceName,
     deviceStatus: []
   };
-
-  let result = await MogoModule.save(data)
+  let device = new MogoModule.Device(data);
+  let result = await device.save(data)
 
   let topics = await MogoModule.Topic.find({ productkey: productkey }, { _id: 0, __v: 0 })
   topics = topics.map(item => {

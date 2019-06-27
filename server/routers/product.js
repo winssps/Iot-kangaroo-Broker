@@ -22,8 +22,8 @@ router.post('/', async (ctx, next) => {
   let data = ctx.request.body;
   console.log(data)
   const ProductKey = data.productkey;
-
-  let result = await MogoModule.Product.save(data)
+  let product = new MogoModule.Product(data);
+  await product.save(data);
 
   const topic_str_update = `/${ProductKey}/\$\{deviceName\}/user/update`;
   const topic_str_error = `/${ProductKey}/\$\{deviceName\}/user/update/error`;
@@ -85,7 +85,8 @@ router.post('/function', async (ctx, next) => {
   let data = ctx.request.body;
   console.log(data)
   let key = data.productkey;
-  await MogoModule.Functions.save(data)
+  let func = new MogoModule.Functions(data);
+  await func.save(data)
   let functions_data = await MogoModule.Functions.find({ productkey: key }, { _id: 0, __v: 0 })
   ctx.body = functions_data;
 });

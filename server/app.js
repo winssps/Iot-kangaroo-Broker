@@ -1,20 +1,11 @@
-var Koa = require('koa');
-var cors = require('koa-cors');
-var bodyParser = require('koa-bodyparser');
+const Koa = require('koa');
+const cors = require('koa-cors');
+const bodyParser = require('koa-bodyparser');
 
 
 const router = require('./routers/index');
 
-const MogoModule = require('./models/mongodb');
-
-
-
-
-
-
 const app = new Koa();
-
-
 
 app.use(cors());
 app.use(bodyParser());

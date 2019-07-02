@@ -79,13 +79,25 @@ const DeviceValueSchema = new mongoose.Schema({
 
 var DeviceValue = mongoose.model('DeviceValue', DeviceValueSchema);
 
+
+const UserSchema = new mongoose.Schema({
+  username: String,
+  password: String,
+  label: String,
+  created_time: { type: Date, default: Date.now },
+  authority: Number
+});
+
+var User = mongoose.model('User', UserSchema);
+
 module.exports = {
   Product,
   Topic,
   Functions,
   Device,
   DeviceTopic,
-  DeviceValue
+  DeviceValue,
+  User
 };
 
 

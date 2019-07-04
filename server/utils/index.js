@@ -10,7 +10,7 @@ function getToken(payload = {}) {
 /* 通过token获取JWT的payload部分 */
 function getJWTPayload(token) {
   // 验证并解析JWT
-  return jwt.verify(token.split(' ')[1], secret);
+  return jwtJson.verify(token.split(' ')[1], secret);
 }
 
 module.exports = {

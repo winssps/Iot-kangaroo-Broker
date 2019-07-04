@@ -1,8 +1,11 @@
 const router = require('koa-router')();
 const MogoModule = require('../models/mongodb');
+const { getJWTPayload } = require('../utils');
 
 router.get('/', async (ctx, next) => {
   // 查询全部产品信息
+  let payload = getJWTPayload(ctx.headers.authorization);
+  console.log(payload)
   let products = await MogoModule.Product.find()
   ctx.body = products;
 })

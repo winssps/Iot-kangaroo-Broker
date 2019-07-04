@@ -3,6 +3,8 @@ const MogoModule = require('../models/mongodb');
 
 
 router.get('/', async (ctx, next) => {
+  let payload = getJWTPayload(ctx.headers.authorization);
+  console.log(payload)
   let devices = await MogoModule.Device.find()
   console.log(devices)
   ctx.body = devices;

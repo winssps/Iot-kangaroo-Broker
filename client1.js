@@ -1,8 +1,15 @@
-var mqtt = require('mqtt')
-var client = mqtt.connect('mqtt://emqx@127.0.0.1', {
-  clientId: 'mqtt_hallRH',
+var mqtt = require('mqtt');
+
+const clientId = 'mqtt_in34523';
+const productKey = '5UVBqPltXj8';
+let data = {
+  InTemp: 90.56
+};
+
+const client = mqtt.connect('mqtt://emqx@127.0.0.1', {
+  clientId: clientId,
   // username: 'admin',
-  password: 'public'
+  // password: 'public'
 })
 
 client.on('connect', function (connack) {
@@ -12,9 +19,7 @@ client.on('connect', function (connack) {
   // client.subscribe('presence');
 
   // 向服务器端发布数据  
-  client.publish('/FgSKodQfBhS/mqtt_hallRH/user/update', JSON.stringify({hallRH: 20}));
-  // client.publish('/FgSKodQfBhS/mqtt_hallRH/user/update/error', "hello error");
-
+  client.publish(`/${productKey}/${clientId}/user/update`, JSON.stringify(data));
 
 })
 

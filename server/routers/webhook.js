@@ -24,22 +24,36 @@ router.post('/', async (ctx, next) => {
       var payloadData = '';
       if (typeof payload == "string") {
         payloadData = JSON.parse(payload);
-        console.log(payloadData)
+        // console.log(payloadData)
       } else if (typeof payload == 'object') {
         payloadData = payload;
       }
       await MogoModule.DeviceTopic.find({ devicename: from_client_id, topic: topic })
       let result = await MogoModule.DeviceValue.find({ devicename: from_client_id })
       console.log(result[0].deviceStatus)
-      let statusDataArr = res[0].deviceStatus;
+
+      console.log(payloadData)
+      let statusDataArr = result[0].deviceStatus;
+
       for (payload_key in payloadData) {
+        console.log('key:', payload_key)
+        console.log("statusDataArr.length", statusDataArr.length)
         for (let i = 0; i < statusDataArr.length; i++) {
-          if (statusDataArr[i].hasOwnProperty(payload_key)) {
-            statusDataArr[i]['new_value'] = payloadData[payload_key];
+          if (statusDataArr[i]['function_identification'] == payload_key) {
+
+            let range = statusDataArr[i]['function_range'].split('~');
+            console.log(range)
+            if(payloadData[payload_key] >= range[0] && payloadData[payload_key] <= range[1]) {
+              statusDataArr[i]['new_value'] = payloadData[payload_key];
+              statusDataArr[i]['update_time'] = Date.now();
+            }
           }
         }
       }
-      await MogoModule.DeviceValue.updateOne({ devicename: from_client_id }, { deviceStatus: statusDataArr })
+
+      console.log("statusDataArr:", statusDataArr)
+
+      await MogoModule.DeviceValue.updateMany({ devicename: from_client_id }, { deviceStatus: statusDataArr })
       break;
     case 'client_disconnected':
       var { client_id } = webhook;

@@ -1,6 +1,6 @@
 const router = require('koa-router')();
 const MogoModule = require('../models/mongodb');
-
+const { getJWTPayload } = require('../utils');
 
 router.get('/', async (ctx, next) => {
   let payload = getJWTPayload(ctx.headers.authorization);
